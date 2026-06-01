@@ -8,7 +8,7 @@ void main() async {
   // --- COLLER TES INFORMATIONS SUPABASE ICI ---
   await Supabase.initialize(
     url: 'https://frsvuwpidxsxuczgwmfh.supabase.co', 
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyc3Z1d3BpZHhzeHVjemd3bWZoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzI4MzQzMCwiZXhwIjoyMDg4ODU5NDMwfQ.YAx5DQFBRVQhe5MvbELzLx6RRnAtiu-gr1MRwJP1Ras',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyc3Z1d3BpZHhzeHVjemd3bWZoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzI4MzQzMCwiZXhwIjoyMDg4ODU5NDMwfQ.YAx5DQ[...]
   );
   // ---------------------------------------------
   
@@ -32,8 +32,8 @@ class _ShieldCheckAppState extends State<ShieldCheckApp> {
   }
 
   Future<void> initShieldCheck() async {
-    // Récupération de l'IMEI
-    String imei = await DeviceInformation.deviceIMEI;
+    // Récupération de l'IMEI - FIX: utiliser deviceIMEINumber au lieu de deviceIMEI
+    String imei = await DeviceInformation.deviceIMEINumber;
     setState(() => monImei = imei);
 
     // Surveillance en temps réel de la base
