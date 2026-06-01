@@ -11,5 +11,4 @@ dependencies:
   device_information: ^0.1.1
 
 flutter:
-  uses-material-design: tr
-  ue
+  uses-material-design: true
