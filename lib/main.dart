@@ -1,45 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_quickstart/pages/account_page.dart';
-import 'package:supabase_quickstart/pages/login_page.dart';
-import 'package:supabase_quickstart/pages/splash_page.dart';
+import 'package:device_information/device_information.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
+  // --- COLLER TES INFORMATIONS SUPABASE ICI ---
   await Supabase.initialize(
-    // TODO: Replace credentials with your own
-    url: '[YOUR_SUPABASE_URL]',
-    anonKey: '[YOUR_SUPABASE_ANNON_KEY]',
+    url: 'https://frsvuwpidxsxuczgwmfh.supabase.co', 
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyc3Z1d3BpZHhzeHVjemd3bWZoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzI4MzQzMCwiZXhwIjoyMDg4ODU5NDMwfQ.YAx5DQFBRVQhe5MvbELzLx6RRnAtiu-gr1MRwJP1Ras',
   );
-  runApp(MyApp());
+  // ---------------------------------------------
+  
+  runApp(const MaterialApp(home: ShieldCheckApp()));
 }
 
-class MyApp extends StatelessWidget {
+class ShieldCheckApp extends StatefulWidget {
+  const ShieldCheckApp({super.key});
+  @override
+  State<ShieldCheckApp> createState() => _ShieldCheckAppState();
+}
+
+class _ShieldCheckAppState extends State<ShieldCheckApp> {
+  bool estBloque = false;
+  String monImei = "Chargement...";
+
+  @override
+  void initState() {
+    super.initState();
+    initShieldCheck();
+  }
+
+  Future<void> initShieldCheck() async {
+    // Récupération de l'IMEI
+    String imei = await DeviceInformation.deviceIMEI;
+    setState(() => monImei = imei);
+
+    // Surveillance en temps réel de la base
+    Supabase.instance.client
+        .from('objets_voles')
+        .stream(primaryKey: ['identifiant'])
+        .eq('identifiant', imei)
+        .listen((data) {
+      if (data.isNotEmpty && data[0]['statut'] == 'recherche') {
+        setState(() => estBloque = true);
+      } else {
+        setState(() => estBloque = false);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Supabase Flutter',
-      theme: ThemeData.dark().copyWith(
-        primaryColor: Colors.green,
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.green,
+    if (estBloque) {
+      return const Scaffold(
+        backgroundColor: Colors.red,
+        body: Center(
+          child: Text(
+            "SHIELD CHECK: TÉLÉPHONE DÉCLARÉ VOLÉ",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
           ),
         ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.green,
-          ),
-        ),
-      ),
-      initialRoute: '/',
-      routes: <String, WidgetBuilder>{
-        '/': (_) => const SplashPage(),
-        '/login': (_) => const LoginPage(),
-        '/account': (_) => const AccountPage(),
-      },
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(title: const Text("ShieldCheck Mali")),
+      body: Center(child: Text("Système actif.\nVotre IMEI : $monImei", textAlign: TextAlign.center)),
     );
   }
 }
