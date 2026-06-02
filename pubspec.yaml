@@ -1,5 +1,5 @@
 name: shield_check_mali
-description: "Application ShieldCheck Mali"
+description: "Application ShieldCheck Mali - Système anti-vol"
 publish_to: 'none'
 
 version: 1.0.0+1
