@@ -1,77 +1,169 @@
-> **Warning**
-> We have consolidated all the examples into the Supabase main repo. Please visit [here](https://github.com/supabase/supabase/tree/master/examples/user-management/flutter-user-management) to view the updated example.
+# ShieldCheck Mali - Application de Sécurité Anti-Vol
 
-# Supabase Flutter User Management
+## 📱 Description
 
-This repo is a quick sample of how you can get started building apps using Flutter and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter  guide](https://supabase.io/docs/guides/with-flutter). 
+ShieldCheck Mali est une application Flutter conçue pour protéger les téléphones mobiles contre le vol. Elle permet de :
 
-This repo will demonstrate how to:
-- sign users in with Supabase Auth using [magic link](https://supabase.io/docs/reference/dart/auth-signin#sign-in-with-magic-link)
-- store and retrieve data with [Supabase database](https://supabase.io/docs/guides/database)
-- store image files in [Supabase storage](https://supabase.io/docs/guides/storage)
+- **Surveiller** l'état d'un téléphone déclaré volé en temps réel via une base de données Supabase
+- **Verrouiller** automatiquement l'écran du téléphone dès que son statut devient "recherche"
+- **Tracker** la position GPS du téléphone toutes les 5 minutes et l'envoyer à la base de données
+- **Demander** les droits d'administrateur Android pour activer les capacités de verrouillage
 
-## Getting Started
+## 🚀 Fonctionnalités Principales
 
-Before running this app, you need to create a Supabase project and copy [your credentials](https://supabase.io/docs/guides/with-flutter#get-the-api-keys) to `main.dart`. 
+### 1. Gestion des Permissions Android
+- Permission `BIND_DEVICE_ADMIN` pour le contrôle du verrouillage
+- Permission d'accès aux données GPS (localisation fine et approximative)
+- Permission d'accès à Internet pour Supabase
 
-You can run this app on iOS, Android or the Web. 
+### 2. Connexion Base de Données
+- Intégration Supabase avec surveillance en temps réel
+- Surveillance de la colonne `identifiant` (basée sur l'IMEI du téléphone)
+- Filtrage automatique des entrées avec statut = 'recherche'
 
-To run this application, simply run the following for iOS or Android
-```bash
-flutter run
+### 3. Logique de Blocage
+- Utilisation de DeviceAdmin pour verrouiller l'écran instantanément
+- Appel à `lockNow()` dès que le statut devient 'recherche'
+- Interface UI blocage affichant un message d'alerte en rouge
+
+### 4. Tracking GPS
+- Envoi automatique de la position GPS toutes les 5 minutes
+- Mise à jour des colonnes `derniere_lat` et `derniere_long` dans la base de données
+- Fonctionnement continu tant que le statut reste 'recherche'
+
+## 📋 Structure de la Base de Données
+
+Table `objets_voles` :
+```sql
+- identifiant (TEXT) - IMEI du téléphone
+- statut (TEXT) - 'normal' ou 'recherche'
+- derniere_lat (FLOAT) - Latitude de la dernière position
+- derniere_long (FLOAT) - Longitude de la dernière position
 ```
 
-Or for web, run the following command to launch it on `localhost:3000`
+## 🔧 Installation et Build
+
+### Prérequis
+- Flutter SDK 3.0.0 ou supérieur
+- Android SDK 21 (API Level 21) ou supérieur
+- Java JDK 11 ou supérieur
+
+### Étapes d'Installation
+
+1. **Cloner le répertoire**
 ```bash
-flutter run -d web-server --web-hostname localhost --web-port 3000
+git clone https://github.com/maluharik1-tech/supabase-flutter-quickstart.git
+cd supabase-flutter-quickstart
 ```
 
-## Database Schema
+2. **Installer les dépendances Flutter**
+```bash
+flutter pub get
+```
+
+3. **Configurer les identifiants Supabase** dans `lib/main.dart`
+```dart
+await Supabase.initialize(
+  url: 'YOUR_SUPABASE_URL',
+  anonKey: 'YOUR_SUPABASE_ANON_KEY',
+);
+```
+
+4. **Build l'APK**
+```bash
+flutter build apk --release
+```
+
+L'APK généré sera situé à : `build/app/outputs/apk/release/app-release.apk`
+
+## 📦 Fichiers Clés Modifiés
+
+- **`lib/main.dart`** - Logique principale avec MethodChannels pour Device Admin
+- **`android/app/src/main/AndroidManifest.xml`** - Déclaration des permissions et récepteurs
+- **`android/app/src/main/kotlin/.../MainActivity.kt`** - Gestion des MethodChannels
+- **`android/app/src/main/kotlin/.../ShieldCheckDeviceAdminReceiver.kt`** - Récepteur Device Admin
+- **`android/app/src/main/kotlin/.../BootReceiver.kt`** - Gestion du démarrage et GPS
+- **`android/app/src/main/res/xml/device_admin_receiver.xml`** - Configuration Device Admin
+- **`pubspec.yaml`** - Dépendances Flutter
+
+## 🔐 Permissions Requises
+
+L'application demandera les permissions suivantes au démarrage :
+
+1. **Device Admin** - Pour le verrouillage d'écran
+2. **Localisation** - Pour le tracking GPS
+3. **Internet** - Pour la communication avec Supabase
+
+## 📲 Utilisation
+
+### Au Premier Lancement
+
+1. L'application affichera votre IMEI unique
+2. Un dialogue demandera l'activation des droits d'administrateur
+3. Acceptez pour activer toutes les fonctionnalités
+
+### Fonctionnement Normal
+
+- L'application affiche "Système actif" et votre IMEI
+- L'application surveille la base de données Supabase en temps réel
+
+### En Cas de Vol
+
+1. Mettez à jour le statut du téléphone à 'recherche' dans la base de données
+2. L'écran du téléphone se verrouille **instantanément**
+3. L'application commence à envoyer le GPS toutes les 5 minutes
+4. Consultez la base de données pour retrouver la position
+
+## 🔗 Lien de Téléchargement APK
+
+**APK Généré Automatiquement** : [Voir les Artifacts GitHub](https://github.com/maluharik1-tech/supabase-flutter-quickstart/actions)
+
+Pour télécharger l'APK :
+1. Allez sur l'onglet **Actions** du repository
+2. Cliquez sur le dernier workflow "Build ShieldCheck APK"
+3. Téléchargez l'artifact "ShieldCheck-Mali-APK"
+
+## 📝 Configuration Supabase
+
+Assurez-vous que votre table `objets_voles` existe avec la structure suivante :
 
 ```sql
--- Create a table for public "profiles"
-create table profiles (
-  id uuid references auth.users not null,
-  updated_at timestamp with time zone,
-  username text unique,
-  avatar_url text,
-  website text,
-
-  primary key (id),
-  unique(username),
-  constraint username_length check (char_length(username) >= 3)
+CREATE TABLE objets_voles (
+  id BIGSERIAL PRIMARY KEY,
+  identifiant TEXT UNIQUE NOT NULL,
+  statut TEXT NOT NULL DEFAULT 'normal',
+  derniere_lat FLOAT,
+  derniere_long FLOAT,
+  date_creation TIMESTAMP DEFAULT NOW(),
+  date_modification TIMESTAMP DEFAULT NOW()
 );
-
-alter table profiles enable row level security;
-
-create policy "Public profiles are viewable by everyone."
-  on profiles for select
-  using ( true );
-
-create policy "Users can insert their own profile."
-  on profiles for insert
-  with check ( auth.uid() = id );
-
-create policy "Users can update own profile."
-  on profiles for update
-  using ( auth.uid() = id );
-
--- Set up Realtime!
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
-alter publication supabase_realtime add table profiles;
-
--- Set up Storage!
-insert into storage.buckets (id, name)
-values ('avatars', 'avatars');
-
-create policy "Avatar images are publicly accessible."
-  on storage.objects for select
-  using ( bucket_id = 'avatars' );
-
-create policy "Anyone can upload an avatar."
-  on storage.objects for insert
-  with check ( bucket_id = 'avatars' );
 ```
+
+## 🐛 Dépannage
+
+### L'écran ne se verrouille pas
+- Vérifiez que les droits Device Admin sont activés
+- Vérifiez que le statut dans la base de données est exactement 'recherche'
+
+### Le GPS ne se met pas à jour
+- Vérifiez la permission de localisation
+- Vérifiez que le signal GPS est disponible
+- Consultez les logs pour les erreurs
+
+### L'application plante au démarrage
+- Vérifiez que les identifiants Supabase sont corrects
+- Vérifiez que Flutter est à jour : `flutter upgrade`
+
+## 📧 Support
+
+Pour tout problème ou question, créez une issue sur le repository GitHub.
+
+## 📄 Licence
+
+Ce projet est fourni tel quel à des fins de démonstration et d'utilisation.
+
+---
+
+**Version** : 1.0.0  
+**Dernière mise à jour** : 2 Juin 2026  
+**Développeur** : maluharik1-tech
