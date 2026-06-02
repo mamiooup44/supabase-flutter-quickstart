@@ -24,7 +24,7 @@ class MainActivity: FlutterActivity() {
                 when (call.method) {
                     "requestDeviceAdmin" -> {
                         requestDeviceAdmin()
-                        result(isDeviceAdminActive())
+                        result(null)
                     }
                     "lockDevice" -> {
                         lockDevice()
