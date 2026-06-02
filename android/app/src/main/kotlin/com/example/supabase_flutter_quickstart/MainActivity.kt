@@ -24,13 +24,13 @@ class MainActivity: FlutterActivity() {
                 when (call.method) {
                     "requestDeviceAdmin" -> {
                         requestDeviceAdmin()
-                        result(null)
+                        result.success(null)
                     }
                     "lockDevice" -> {
                         lockDevice()
-                        result(true)
+                        result.success(true)
                     }
-                    else -> result(null)
+                    else -> result.notImplemented()
                 }
             }
     }
