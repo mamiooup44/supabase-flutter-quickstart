@@ -12,7 +12,7 @@ void main() async {
   // --- COLLER TES INFORMATIONS SUPABASE ICI ---
   await Supabase.initialize(
     url: 'https://frsvuwpidxsxuczgwmfh.supabase.co', 
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyc3Z1d3BpZHhzeHVjemd3bWZoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzI4MzQzMCwiZXhwIjoyMDg4ODU5NDMwfQ.YAx5DQ[...]
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyc3Z1d3BpZHhzeHVjemd3bWZoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzI4MzQzMCwiZXhwIjoyMDg4ODU5NDMwfQ.YAx5DQ',
   );
   // ---------------------------------------------
   
